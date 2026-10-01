@@ -7,9 +7,18 @@ function Login() {
   const navigate = useNavigate();
   useEffect(() => {
   const token = sessionStorage.getItem("token");
+  const savedUser = sessionStorage.getItem("user");
 
-  if (token) {
-    navigate("/services", { replace: true });
+  if (token && savedUser) {
+    const user = JSON.parse(savedUser);
+
+    if (user.role === "admin") {
+      navigate("/admin", { replace: true });
+    } else if (user.role === "worker") {
+      navigate("/worker", { replace: true });
+    } else {
+      navigate("/services", { replace: true });
+    }
   }
 }, [navigate]);
 
@@ -45,7 +54,13 @@ function Login() {
       sessionStorage.setItem("token", token);
       sessionStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/services");
+      if (user.role === "admin") {
+  navigate("/admin");
+} else if (user.role === "worker") {
+  navigate("/worker");
+} else {
+  navigate("/services");
+}
     } catch (err) {
       setError(
         err.response?.data?.message ||

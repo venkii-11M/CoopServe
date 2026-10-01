@@ -136,8 +136,32 @@ const assignWorker = async (req, res) => {
   }
 };
 
+// Get all pending bookings for admin
+const getPendingBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      status: "Pending",
+    })
+      .populate("customer", "name phone email")
+      .populate("service", "name category basePrice")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      count: bookings.length,
+      bookings,
+    });
+  } catch (error) {
+    console.error("Get pending bookings error:", error.message);
+
+    return res.status(500).json({
+      message: "Server error while fetching pending bookings",
+    });
+  }
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
   assignWorker,
+  getPendingBookings,
 };

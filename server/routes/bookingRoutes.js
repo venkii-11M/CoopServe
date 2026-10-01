@@ -5,6 +5,7 @@ const {
   createBooking,
   getMyBookings,
   assignWorker,
+  getPendingBookings,
 } = require("../controllers/bookingController");
 
 const {
@@ -15,5 +16,7 @@ const {
 router.post("/", protect, createBooking);
 router.get("/my", protect, getMyBookings);
 router.put("/assign", protect, adminOnly, assignWorker);
+router.get( "/admin/pending", protect,adminOnly,getPendingBookings);
+
 
 module.exports = router;
