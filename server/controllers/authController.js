@@ -24,6 +24,25 @@ const registerUser = async (req, res) => {
         message: "Email already registered",
       });
     }
+    // 3. Validate account role
+const selectedRole = role || "customer";
+
+if (!["customer", "worker", "admin"].includes(selectedRole)) {
+  return res.status(400).json({
+    message: "Invalid account type",
+  });
+}
+
+// Admin registration requires a secret code
+if (selectedRole === "admin") {
+  const { adminCode } = req.body;
+
+  if (!adminCode || adminCode !== process.env.ADMIN_REGISTER_CODE) {
+    return res.status(403).json({
+      message: "Invalid admin registration code",
+    });
+  }
+}
 
     // 3. Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);

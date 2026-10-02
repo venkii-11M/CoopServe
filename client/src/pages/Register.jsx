@@ -12,6 +12,8 @@ function Register() {
     email: "",
     phone: "",
     password: "",
+    role: "customer",
+    adminCode: "",
   });
 
   const [error, setError] = useState("");
@@ -38,10 +40,7 @@ function Register() {
     try {
       setLoading(true);
 
-      const response = await api.post("/auth/register", {
-        ...formData,
-        role: "customer",
-      });
+      const response = await api.post("/auth/register", formData);
 
       alert(response.data.message || "Account created successfully!");
 
@@ -144,6 +143,36 @@ function Register() {
                 required
               />
             </div>
+<label htmlFor="role">Account type</label>
+<div className="auth-input">
+  <select
+    id="role"
+    name="role"
+    value={formData.role}
+    onChange={handleChange}
+    required
+  >
+    <option value="customer">Customer</option>
+    <option value="worker">Worker</option>
+    <option value="admin">Admin</option>
+  </select>
+</div>
+
+{formData.role === "admin" && (
+  <>
+    <label htmlFor="adminCode">Admin Code</label>
+
+    <input
+      id="adminCode"
+      type="password"
+      name="adminCode"
+      placeholder="Enter code"
+      value={formData.adminCode}
+      onChange={handleChange}
+      required
+    />
+  </>
+)}
 
             <button
               type="submit"

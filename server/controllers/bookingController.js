@@ -159,9 +159,84 @@ const getPendingBookings = async (req, res) => {
   }
 };
 
+// Get bookings assigned to the logged-in worker
+const getWorkerBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({
+      worker: req.user._id,
+    })
+      .populate("customer", "name phone email")
+      .populate("service", "name category basePrice")
+      .sort({ bookingDate: 1 });
+
+    return res.status(200).json({
+      count: bookings.length,
+      bookings,
+    });
+  } catch (error) {
+    console.error("Get worker bookings error:", error.message);
+
+    return res.status(500).json({
+      message: "Server error while fetching worker bookings",
+    });
+  }
+};
+
+
+// Update booking status by worker
+const updateWorkerBookingStatus = async (req, res) => {
+  try {
+    const { bookingId, status } = req.body;
+
+    if (!bookingId || !status) {
+      return res.status(400).json({
+        message: "Booking ID and status are required",
+      });
+    }
+
+    // Only allow these status changes from worker
+    const allowedStatuses = ["Accepted", "Completed", "Cancelled"];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid booking status",
+      });
+    }
+
+    // Find booking assigned to this worker
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      worker: req.user._id,
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found or not assigned to you",
+      });
+    }
+
+    booking.status = status;
+
+    await booking.save();
+
+    return res.status(200).json({
+      message: "Booking status updated successfully",
+      booking,
+    });
+  } catch (error) {
+    console.error("Update worker booking error:", error.message);
+
+    return res.status(500).json({
+      message: "Server error while updating booking status",
+    });
+  }
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
   assignWorker,
   getPendingBookings,
+  getWorkerBookings,
+  updateWorkerBookingStatus,
 };

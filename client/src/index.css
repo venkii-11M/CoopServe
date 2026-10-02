@@ -1195,3 +1195,13 @@ a {
     flex-direction: column;
   }
 }
+.auth-input select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  font-family: inherit;
+  color: #222;
+  cursor: pointer;
+}
